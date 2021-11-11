@@ -34,7 +34,7 @@ settings.Value.J = diag([settings.Value.Ix settings.Value.Iy settings.Value.Iz])
 settings.Value.invJ = inv(settings.Value.J);
 
 %%% Initial angular velocities (BODY FRAME)
-settings.Value.wx0 = 0.001;           % [rad/s] Initial X axis angular velocity
+settings.Value.wx0 = 0.001;              % [rad/s] Initial X axis angular velocity
 settings.Value.wy0 = 0.005;              % [rad/s] Initial Y axis angular velocity
 settings.Value.wz0 = 0.001;              % [rad/s] Initial Z axis angular velocity
 % Create the intial angular velocity vector
@@ -53,10 +53,34 @@ mu = settings.Value.mu;
 a = 1/( 2/norm(r0) - dot(v0,v0)/mu );    % [km] Semi-major axis
 Tperiod = 2*pi*sqrt( a^3/mu );           % [s] Orbital period
 
+% Get Julian day 2000
+t = datetime('now');
+[y, M, d] = ymd(t);
+[h, m, s] = hms(t);
+date = [y, M, d, h, m, s];
+time_mjd2000 = date2mjd2000(date);
+
+% Get Keplerian parameters of the Earth
+[kep_Earth, ksun] = uplanet(time_mjd2000, 3);
+
+%% Get Cartesian position and velocity of the Earth
+% Planetary orbital elements are restituited in a Sun-centred ecliptic system.
+[rrE, vvE] = par2car(kep_Earth, ksun);
+settings.Value.EarthY0 = [rrE; vvE];
+
+%% Get Cartesian position and velocity of the Moon
+% Position vector of the Moon in cartesian coordinates, expressed in the
+% Geocentric Equatorial Reference Frame (IAU-76/FK5 J2000, mean equator,
+%   mean equinox frame)
+[xxM, vvP] = ephMoon(time_mjd2000);
+settings.Value.MoonY0 = [rrM; vvM];
+
+
+%% RUN THE SIMULATION
 % Set the simulation time
 settings.Value.Tsim = settings.Value.Nperiod * Tperiod;
 
-%% RUN THE SIMULATION
+% Simulation run
 simOut = sim('model.slx', 'SrcWorkspace', 'current');
 
 % Retrieve output data

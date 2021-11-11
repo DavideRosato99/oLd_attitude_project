@@ -2,6 +2,9 @@ clc
 clear all
 close all
 
+%% Needed scripts path
+addpath(strcat(pwd, '\timeConversion'))
+
 %% DEFINE SETTINGS STRUCTURE
 % Create a Simulink object to use settings struct in Simulink
 settings = Simulink.Parameter;
@@ -72,7 +75,7 @@ settings.Value.EarthY0 = [rrE; vvE];
 % Position vector of the Moon in cartesian coordinates, expressed in the
 % Geocentric Equatorial Reference Frame (IAU-76/FK5 J2000, mean equator,
 %   mean equinox frame)
-[xxM, vvP] = ephMoon(time_mjd2000);
+[rrM, vvM] = ephMoon(time_mjd2000);
 settings.Value.MoonY0 = [rrM; vvM];
 
 

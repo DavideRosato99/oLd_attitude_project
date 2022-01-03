@@ -11,37 +11,31 @@ settings = Simulink.Parameter;
 settings.Value = struct;
 settings.CoderInfo.StorageClass = 'ExportedGlobal';
 
-%% SETUP
-%%% Simulation configuration
+%% *************************** USER HERE **********************************
+%%% SIMULATION CONFIGURATION
+settings.Value.date0   = [2021 12 20 12 0 0];
 settings.Value.Nperiod = 1;             % [-] Number of nominal period
-settings.Value.quat = true;             % [-] True if kinematics are computed with quaternions
 
-%%% Orbit perturbation models, followed by model constants
+%%% PERTURBATION MODELS
 settings.Value.orbitPert.J2 = true;     % [-] True if J2 orbit perturbation is computed
-settings.Value.orbitPert.J2value = astroConstants(9);
 
-%%% Starting orbit parameters (INERTIAL FRAME)
-settings.Value.mu = astroConstants(13); % [km^3/s^2] Earth's gravitational parameter
-settings.Value.Re = astroConstants(23); % [km] Earth's mean radius
-settings.Value.r0 = [26578.137; 0; 0];  % [km] Initial position in reference frame
-settings.Value.v0 = [0; 2.221; 1];      % [km/s] Initial velocity in reference frame
-% Create initial state vector
-settings.Value.Y0 = [settings.Value.r0; settings.Value.v0];
+%%% STARTING ORBIT PARAMETERS (INERTIAL FRAME)
+a  = 72776;                             % [km] Orbit semi-major axis
+e  = 0.6665;                            % [-] Orbit eccentricity
+i  = deg2rad(134.2783);                 % [rad] Orbit innclination
+OM = deg2rad(182.313);                  % [rad] Orbit RAAN
+om = deg2rad(120.667);                  % [rad] Orbit pericenter anomaly
+th = 0;                                 % [rad] Orbit true anomaly
 
-%%% Inertias
+%%% INERTIAS
 settings.Value.Ix = 0.01;               % [kg m^2] Inertia moment along X axis
 settings.Value.Iy = 0.05;               % [kg m^2] Inertia moment along Y axis
 settings.Value.Iz = 0.07;               % [kg m^2] Inertia moment along Z axis
-% Create the inertia matrix and its inverse matrix
-settings.Value.J = diag([settings.Value.Ix settings.Value.Iy settings.Value.Iz]);
-settings.Value.invJ = inv(settings.Value.J);
 
-%%% Initial angular velocities (BODY FRAME)
-settings.Value.wx0 = 0.001;              % [rad/s] Initial X axis angular velocity
-settings.Value.wy0 = 0.005;              % [rad/s] Initial Y axis angular velocity
-settings.Value.wz0 = 0.001;              % [rad/s] Initial Z axis angular velocity
-% Create the intial angular velocity vector
-settings.Value.omega0 = [settings.Value.wx0 settings.Value.wy0 settings.Value.wz0]';
+%%% INITIAL ANGULAR VELOCITIES (BODY FRAME)
+settings.Value.wx0 = 0.001;             % [rad/s] Initial X axis angular velocity
+settings.Value.wy0 = 0.005;             % [rad/s] Initial Y axis angular velocity
+settings.Value.wz0 = 0.001;             % [rad/s] Initial Z axis angular velocity
 
 %%% Initial direction cosines matrix
 settings.Value.DCM0 = eye(3);
@@ -49,40 +43,52 @@ settings.Value.DCM0 = eye(3);
 %%% Initial quaternion
 settings.Value.q0 = [1 0 0 0]';
 
-%% PRE SIMULATION CALCULATIONS
-r0 = settings.Value.r0;
-v0 = settings.Value.v0;
-mu = settings.Value.mu;
-a = 1/( 2/norm(r0) - dot(v0,v0)/mu );    % [km] Semi-major axis
-Tperiod = 2*pi*sqrt( a^3/mu );           % [s] Orbital period
+%%% SENSORS
+settings.Value.SunSensorAccuracy = 1/8;
+settings.Value.SunSensorSampleRate = 5;
+settings.Value.EarthSensorAccuracy = 1;
+settings.Value.EarthSensorSampleRate = 10;
+settings.Value.GyroscopeARW = 0.15;
+settings.Value.GyroscopeRRW = 0.3;
+settings.Value.GyroscopeSampleRate = 1000;
+settings.Value.MagnetoTorquerMaxDipole = 1.19;
 
-% Get Julian day 2000
-t = datetime('now');
-[y, M, d] = ymd(t);
-[h, m, s] = hms(t);
-date = [y, M, d, h, m, s];
-time_mjd2000 = date2mjd2000(date);
+%% ***** FROM NOW ON DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING *****
+%%% PERTURBATION MODELS
+settings.Value.orbitPert.J2value = astroConstants(9);
 
-% Get Keplerian parameters of the Earth
-[kep_Earth, ksun] = uplanet(time_mjd2000, 3);
+%%% STARTING ORBIT PARAMETERS (INERTIAL FRAME)
+settings.Value.muE = astroConstants(13); % [km^3/s^2] Earth's gravitational parameter
+settings.Value.muS = astroConstants(4);  % [km^3/s^2] Sun's gravitational parameter
+settings.Value.Re = astroConstants(23); % [km] Earth's mean radius
+% Calculates Initial orbit position and velocity
+[rr0, vv0] = par2car([a, e, i, OM, om, th], settings.Value.muE);
+settings.Value.r0 = rr0;                % [km] Initial position in reference frame
+settings.Value.v0 = vv0;                % [km/s] Initial velocity in reference frame
 
-%% Get Cartesian position and velocity of the Earth
-% Planetary orbital elements are restituited in a Sun-centred ecliptic system.
-[rrE, vvE] = par2car(kep_Earth, ksun);
-settings.Value.EarthY0 = [rrE; vvE];
+% Create initial state vector
+settings.Value.Y0 = [settings.Value.r0; settings.Value.v0];
+kepEarth = uplanet(date2mjd2000(settings.Value.date0), 3);
+[rrE, vvE] = par2car(kepEarth, settings.Value.muS);
+settings.Value.Y0E = [rrE; vvE];
 
-%% Get Cartesian position and velocity of the Moon
-% Position vector of the Moon in cartesian coordinates, expressed in the
-% Geocentric Equatorial Reference Frame (IAU-76/FK5 J2000, mean equator,
-%   mean equinox frame)
-[rrM, vvM] = ephMoon(time_mjd2000);
-settings.Value.MoonY0 = [rrM; vvM];
+%%% INERTIAS
+% Create the inertia matrix and its inverse matrix
+settings.Value.J = diag([settings.Value.Ix settings.Value.Iy settings.Value.Iz]);
+settings.Value.invJ = inv(settings.Value.J);
+
+%%% INITIAL AGNGULAR VELOCITIES
+% Create the intial angular velocity vector
+settings.Value.omega0 = [settings.Value.wx0 settings.Value.wy0 settings.Value.wz0]';
+
 
 
 %% RUN THE SIMULATION
 % Set the simulation time
-settings.Value.Tsim = settings.Value.Nperiod * Tperiod;
+Tperiod = 2*pi * sqrt(a^3/settings.Value.muE);
+settings.Value.Tsim = settings.Value.Nperiod * Tperiod/5;
 
+%%
 % Simulation run
 simOut = sim('model.slx', 'SrcWorkspace', 'current');
 

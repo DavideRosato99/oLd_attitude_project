@@ -21,33 +21,33 @@ settings.Value.orbitPert.J2 = true;     % [-] True if J2 orbit perturbation is c
 
 %%% STARTING ORBIT PARAMETERS (INERTIAL FRAME)
 a  = 6971;                             % [km] Orbit semi-major axis
-e  = 0.1;                            % [-] Orbit eccentricity
-i  = deg2rad(10);                 % [rad] Orbit innclination
-OM = deg2rad(80);                  % [rad] Orbit RAAN
-om = deg2rad(123);                  % [rad] Orbit pericenter anomaly
+e  = 0.01;                            % [-] Orbit eccentricity
+i  = deg2rad(0);                 % [rad] Orbit innclination
+OM = deg2rad(0);                  % [rad] Orbit RAAN
+om = deg2rad(0);                  % [rad] Orbit pericenter anomaly
 th = 0;                                 % [rad] Orbit true anomaly
 
 %%% INERTIAS
-settings.Value.Ix = 0.09;               % [kg m^2] Inertia moment along X axis
-settings.Value.Iy = 0.14;               % [kg m^2] Inertia moment along Y axis
-settings.Value.Iz = 0.07;               % [kg m^2] Inertia moment along Z axis
+settings.Value.Ix = 1.009;               % [kg m^2] Inertia moment along X axis
+settings.Value.Iy = 0.251;               % [kg m^2] Inertia moment along Y axis
+settings.Value.Iz = 0.961;               % [kg m^2] Inertia moment along Z axis
 
 %%% INITIAL ANGULAR VELOCITIES (BODY FRAME)
-settings.Value.wx0 = deg2rad(5);             % [rad/s] Initial X axis angular velocity
-settings.Value.wy0 = deg2rad(10);             % [rad/s] Initial Y axis angular velocity
-settings.Value.wz0 = deg2rad(-7);             % [rad/s] Initial Z axis angular velocity
+settings.Value.wx0 = deg2rad(0);             % [rad/s] Initial X axis angular velocity
+settings.Value.wy0 = deg2rad(0);             % [rad/s] Initial Y axis angular velocity
+settings.Value.wz0 = deg2rad(0);             % [rad/s] Initial Z axis angular velocity
 
 %%% Initial direction cosines matrix
-settings.Value.DCM0 = eye(3);
+settings.Value.DCM0 = [1 0 0; 0 1 0; 0 0 1];
 
 %%% Initial quaternion
-settings.Value.q0 = dcm2quat(eye(3,3));
+settings.Value.q0 = dcm2quat([-1 0 0; 0 -1 0; 0 0 1]);
 
 %%% SENSORS
-settings.Value.SunSensorAccuracy = 1/8;
-settings.Value.SunSensorSampleRate = 5;
-settings.Value.EarthSensorAccuracy = 1;
-settings.Value.EarthSensorSampleRate = 10;
+settings.Value.SunSensorAccuracy = 0.1;
+settings.Value.SunSensorSampleRate = 50;
+settings.Value.EarthSensorAccuracy = 0.1;
+settings.Value.EarthSensorSampleRate = 100;
 settings.Value.GyroscopeARW = 0.15;
 settings.Value.GyroscopeRRW = 0.3;
 settings.Value.GyroscopeSampleRate = 1000;
@@ -60,13 +60,16 @@ settings.Value.ObserverLw = 0.05;
 settings.Value.ObserverLd = 5.8e-4;
 settings.Value.ObserverMd0 = [0 0 0]';
 
-settings.Value.detumblingOnlyMagnMaxTime = 150;
-settings.Value.detumblingDetumblingMaxTime = 350;
+settings.Value.detumblingOnlyMagnMaxTime = 0;
+settings.Value.detumblingDetumblingMaxTime = 0;
+settings.Value.slewManeuverMaxTime = 0;
 settings.Value.detumblingkb = 1e7;
-settings.Value.detumblingkp = [0.005*0.1585, 0.005*0.0921, 0.005*0.0866];
+settings.Value.detumblingkp = 0.05;
+settings.Value.slewMank1 = 0.1;
+settings.Value.slewMank2 = 0.0001;
 
-settings.Value.Kp_Target_Pointing = [0.0027*0.1585, 0.0027*0.0921, 0.0027*0.0866];
-settings.Value.Kd_Target_Pointing = [0.104*0.1585, 0.104*0.0921, 0.104*0.0866];
+settings.Value.Kp_Target_Pointing = [0.27, 0.27, 0.27];
+settings.Value.Kd_Target_Pointing = [0.104, 0.104, 0.104];
 
 
 %%% Reaction Wheels

@@ -60,7 +60,7 @@ settings.Value.ObserverLw = 0.05;
 settings.Value.ObserverLd = 5.8e-4;
 settings.Value.ObserverMd0 = [0 0 0]';
 
-settings.Value.detumblingOnlyMagnMaxTime = 0;
+settings.Value.detumblingOnlyMagnMaxTime = 500;
 settings.Value.detumblingDetumblingMaxTime = 0;
 settings.Value.slewManeuverMaxTime = 0;
 settings.Value.detumblingkb = 1e7;

@@ -51,7 +51,34 @@ settings.Value.EarthSensorSampleRate = 10;
 settings.Value.GyroscopeARW = 0.15;
 settings.Value.GyroscopeRRW = 0.3;
 settings.Value.GyroscopeSampleRate = 1000;
+
 settings.Value.MagnetoTorquerMaxDipole = 1.9;
+settings.Value.MagnetoTorquerDipoleError = 0.005;
+settings.Value.MagnetoTorquerSampleRate = 10;
+
+settings.Value.ObserverLw = 0.05;
+settings.Value.ObserverLd = 5.8e-4;
+settings.Value.ObserverMd0 = [0 0 0]';
+
+settings.Value.detumblingOnlyMagnMaxTime = 150;
+settings.Value.detumblingDetumblingMaxTime = 350;
+settings.Value.detumblingkb = 1e7;
+settings.Value.detumblingkp = [0.005*0.1585, 0.005*0.0921, 0.005*0.0866];
+
+settings.Value.Kp_Target_Pointing = [0.0027*0.1585, 0.0027*0.0921, 0.0027*0.0866];
+settings.Value.Kd_Target_Pointing = [0.104*0.1585, 0.104*0.0921, 0.104*0.0866];
+
+
+%%% Reaction Wheels
+settings.Value.IRW = 1e-5;              % [kg*m^2] Reaction Wheels' Moment of Inertia
+settings.Value.MaxRPM = 8000;           % Reaction Wheels' Maximum RPM Allowed
+settings.Value.MaxRPM_Rate = 100;       % Reaction Wheels' Maximum RPM Rate Allowed
+settings.Value.RPMAccuracy = 5;         % Reaction Wheels' RPM Accuracy
+settings.Value.RW_sr = 1;               % Reaction Wheels' Sampling Rate
+
+settings.Value.alpha1StateObserver = -0.6;
+settings.Value.alpha1StateObserverGyro = -0.4;
+
 
 %% ***** FROM NOW ON DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING *****
 %%% PERTURBATION MODELS

@@ -19,6 +19,12 @@ settings.Value.Nperiod = 1;             % [-] Number of nominal period
 %%% PERTURBATION MODELS
 settings.Value.orbitPert.J2 = true;     % [-] True if J2 orbit perturbation is computed
 
+%%% Disturbances
+settings.Value.r_CG = [0.02 0 0];
+settings.Value.CD = 2.2;
+settings.Value.rho = 1.454*1e-13;
+settings.Value.dec = 10;
+
 %%% STARTING ORBIT PARAMETERS (INERTIAL FRAME)
 a  = 6971;                             % [km] Orbit semi-major axis
 e  = 0.01;                            % [-] Orbit eccentricity
@@ -33,9 +39,9 @@ settings.Value.Iy = 0.251;               % [kg m^2] Inertia moment along Y axis
 settings.Value.Iz = 0.961;               % [kg m^2] Inertia moment along Z axis
 
 %%% INITIAL ANGULAR VELOCITIES (BODY FRAME)
-settings.Value.wx0 = deg2rad(-5);             % [rad/s] Initial X axis angular velocity
-settings.Value.wy0 = deg2rad(12);             % [rad/s] Initial Y axis angular velocity
-settings.Value.wz0 = deg2rad(-4);             % [rad/s] Initial Z axis angular velocity
+settings.Value.wx0 = deg2rad(-12);             % [rad/s] Initial X axis angular velocity
+settings.Value.wy0 = deg2rad(-8);             % [rad/s] Initial Y axis angular velocity
+settings.Value.wz0 = deg2rad(7);             % [rad/s] Initial Z axis angular velocity
 
 %%% Initial direction cosines matrix
 settings.Value.DCM0 = [1 0 0; 0 1 0; 0 0 1];
@@ -60,11 +66,11 @@ settings.Value.ObserverLw = 0.05;
 settings.Value.ObserverLd = 5.8e-4;
 settings.Value.ObserverMd0 = [0 0 0]';
 
-settings.Value.detumblingOnlyMagnMaxTime = 9000;
-settings.Value.detumblingDetumblingMaxTime = 9000;
-settings.Value.slewManeuverMaxTime = 9000;
+settings.Value.detumblingOnlyMagnMaxTime = 1000;
+settings.Value.detumblingDetumblingMaxTime = 2000;
+settings.Value.slewManeuverMaxTime = 3500;
 settings.Value.detumblingkb = 1e7;
-settings.Value.detumblingkp = 0.5;
+settings.Value.detumblingkp = 0.05;
 settings.Value.slewMank1 = 0.1;
 settings.Value.slewMank2 = 0.001;
 settings.Value.earthPointk1 = 0.5;
@@ -115,7 +121,7 @@ settings.Value.omega0 = [settings.Value.wx0 settings.Value.wy0 settings.Value.wz
 % Set the simulation time
 Tperiod = 2*pi * sqrt(a^3/settings.Value.muE);
 % settings.Value.Tsim = settings.Value.Nperiod * Tperiod/5;
-settings.Value.Tsim = 9000;
+settings.Value.Tsim = 5000;
 
 %%
 % Simulation run

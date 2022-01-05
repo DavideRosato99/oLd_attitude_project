@@ -33,22 +33,22 @@ settings.Value.Iy = 0.251;               % [kg m^2] Inertia moment along Y axis
 settings.Value.Iz = 0.961;               % [kg m^2] Inertia moment along Z axis
 
 %%% INITIAL ANGULAR VELOCITIES (BODY FRAME)
-settings.Value.wx0 = deg2rad(0);             % [rad/s] Initial X axis angular velocity
-settings.Value.wy0 = deg2rad(0);             % [rad/s] Initial Y axis angular velocity
-settings.Value.wz0 = deg2rad(0);             % [rad/s] Initial Z axis angular velocity
+settings.Value.wx0 = deg2rad(-5);             % [rad/s] Initial X axis angular velocity
+settings.Value.wy0 = deg2rad(12);             % [rad/s] Initial Y axis angular velocity
+settings.Value.wz0 = deg2rad(-4);             % [rad/s] Initial Z axis angular velocity
 
 %%% Initial direction cosines matrix
 settings.Value.DCM0 = [1 0 0; 0 1 0; 0 0 1];
 
 %%% Initial quaternion
-settings.Value.q0 = dcm2quat([-1 0 0; 0 -1 0; 0 0 1]);
+settings.Value.q0 = dcm2quat([1 0 0; 0 1 0; 0 0 1]);
 
 %%% SENSORS
-settings.Value.SunSensorAccuracy = 0.1;
+settings.Value.SunSensorAccuracy = 0.3;
 settings.Value.SunSensorSampleRate = 50;
-settings.Value.EarthSensorAccuracy = 0.1;
+settings.Value.EarthSensorAccuracy = 1;
 settings.Value.EarthSensorSampleRate = 100;
-settings.Value.GyroscopeARW = 0.15;
+settings.Value.GyroscopeARW = 0.2;
 settings.Value.GyroscopeRRW = 0.3;
 settings.Value.GyroscopeSampleRate = 1000;
 
@@ -60,17 +60,15 @@ settings.Value.ObserverLw = 0.05;
 settings.Value.ObserverLd = 5.8e-4;
 settings.Value.ObserverMd0 = [0 0 0]';
 
-settings.Value.detumblingOnlyMagnMaxTime = 500;
-settings.Value.detumblingDetumblingMaxTime = 0;
-settings.Value.slewManeuverMaxTime = 0;
+settings.Value.detumblingOnlyMagnMaxTime = 9000;
+settings.Value.detumblingDetumblingMaxTime = 9000;
+settings.Value.slewManeuverMaxTime = 9000;
 settings.Value.detumblingkb = 1e7;
-settings.Value.detumblingkp = 0.05;
+settings.Value.detumblingkp = 0.5;
 settings.Value.slewMank1 = 0.1;
-settings.Value.slewMank2 = 0.0001;
-
-settings.Value.Kp_Target_Pointing = [0.27, 0.27, 0.27];
-settings.Value.Kd_Target_Pointing = [0.104, 0.104, 0.104];
-
+settings.Value.slewMank2 = 0.001;
+settings.Value.earthPointk1 = 0.5;
+settings.Value.earthPointk2 = 0.05;
 
 %%% Reaction Wheels
 settings.Value.IRW = 1e-5;              % [kg*m^2] Reaction Wheels' Moment of Inertia
@@ -117,7 +115,7 @@ settings.Value.omega0 = [settings.Value.wx0 settings.Value.wy0 settings.Value.wz
 % Set the simulation time
 Tperiod = 2*pi * sqrt(a^3/settings.Value.muE);
 % settings.Value.Tsim = settings.Value.Nperiod * Tperiod/5;
-settings.Value.Tsim = 500;
+settings.Value.Tsim = 9000;
 
 %%
 % Simulation run

@@ -128,7 +128,7 @@ settings.Value.Tsim = Tperiod;
 simOut = sim('model.slx', 'SrcWorkspace', 'current');
 
 %%
-% Retrieve output data
+Retrieve output data
 T = simOut.tout;            % [s] Simulation time
 R = simOut.Y.Data;
 DCM_I2L = simOut.DCM_I2L.Data;
@@ -167,6 +167,7 @@ plot(index,estMD);
 plot(index,magnetoM);
 plot(index,RWsM);
 plot(index,Mtot);
+
 %% slew maneuver
 index = find(T > 2500 & T < 3500);
 plot(index,quaternions);
@@ -178,6 +179,7 @@ plot(index,estMD);
 plot(index,magnetoM);
 plot(index,RWsM);
 plot(index,Mtot);
+
 %% earth poiting maneuver
 index = find(T >3500 & T < Tperiod);
 plot(index,quaternions);

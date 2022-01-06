@@ -28,9 +28,9 @@ settings.Value.dec = 10;
 %%% STARTING ORBIT PARAMETERS (INERTIAL FRAME)
 a  = 6971;                             % [km] Orbit semi-major axis
 e  = 0.01;                            % [-] Orbit eccentricity
-i  = deg2rad(0);                 % [rad] Orbit innclination
-OM = deg2rad(0);                  % [rad] Orbit RAAN
-om = deg2rad(0);                  % [rad] Orbit pericenter anomaly
+i  = deg2rad(10);                 % [rad] Orbit innclination
+OM = deg2rad(80);                  % [rad] Orbit RAAN
+om = deg2rad(123);                  % [rad] Orbit pericenter anomaly
 th = deg2rad(0);                                 % [rad] Orbit true anomaly
 
 %%% INERTIAS
@@ -144,8 +144,51 @@ magnetoM = simOut.MagnetoM.Data;
 RWsM = simOut.RWsM.Data;
 Mtot = simOut.Mtot.Data;
 
-index = find(T >= 0 & T < 300 );
+%% detumbling only magnetotorquers
+index = find(T >= 0 & T < 1500);
 plot(index,quaternions);
+plot(index,omegaReal);
+plot(index,disturb);
+plot(index,eclipse);
+plot(index,attErr);
+plot(index,estMD);
+plot(index,magnetoM);
+plot(index,RWsM);
+plot(index,Mtot);
+
+%% second phase detumbling
+index = find(T >1500 & T < 2500);
+plot(index,quaternions);
+plot(index,omegaReal);
+plot(index,disturb);
+plot(index,eclipse);
+plot(index,attErr);
+plot(index,estMD);
+plot(index,magnetoM);
+plot(index,RWsM);
+plot(index,Mtot);
+%% slew maneuver
+index = find(T > 2500 & T < 3500);
+plot(index,quaternions);
+plot(index,omegaReal);
+plot(index,disturb);
+plot(index,eclipse);
+plot(index,attErr);
+plot(index,estMD);
+plot(index,magnetoM);
+plot(index,RWsM);
+plot(index,Mtot);
+%% earth poiting maneuver
+index = find(T >3500 & T < Tperiod);
+plot(index,quaternions);
+plot(index,omegaReal);
+plot(index,disturb);
+plot(index,eclipse);
+plot(index,attErr);
+plot(index,estMD);
+plot(index,magnetoM);
+plot(index,RWsM);
+plot(index,Mtot);
 
 %% PLOT
 % figure;

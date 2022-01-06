@@ -129,11 +129,23 @@ simOut = sim('model.slx', 'SrcWorkspace', 'current');
 
 %%
 % Retrieve output data
-% T = simOut.tout;            % [s] Simulation time
-% R = simOut.Y.Data;
-% DCM_I2L = simOut.DCM_I2L.Data;
-% DCM_I2B = simOut.DCM_I2B.Data;
-% DCM_L2B = simOut.DCM_L2B.Data;
+T = simOut.tout;            % [s] Simulation time
+R = simOut.Y.Data;
+DCM_I2L = simOut.DCM_I2L.Data;
+DCM_I2B = simOut.DCM_I2B.Data;
+DCM_L2B = simOut.DCM_L2B.Data;
+quaternions = simOut.quaternions.Data;
+omegaReal = simOut.omegaReal.Data;
+disturb = simOut.Disturbances.Data;
+eclipse = simOut.eclipse.Data;
+attErr = simOut.attitudeEstimate.Data;
+estMD = simOut.estMD.Data;
+magnetoM = simOut.MagnetoM.Data;
+RWsM = simOut.RWsM.Data;
+Mtot = simOut.Mtot.Data;
+
+index = find(T >= 0 & T < 300 );
+plot(index,quaternions);
 
 %% PLOT
 % figure;

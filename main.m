@@ -26,11 +26,11 @@ settings.Value.rho = 1.454*1e-13;
 settings.Value.dec = 10;
 
 %%% STARTING ORBIT PARAMETERS (INERTIAL FRAME)
-a  = 6971;                             % [km] Orbit semi-major axis
-e  = 0.01;                            % [-] Orbit eccentricity
-i  = deg2rad(10);                 % [rad] Orbit innclination
-OM = deg2rad(80);                  % [rad] Orbit RAAN
-om = deg2rad(123);                  % [rad] Orbit pericenter anomaly
+a  = 6971;                                       % [km] Orbit semi-major axis
+e  = 0.01;                                       % [-] Orbit eccentricity
+i  = deg2rad(10);                                % [rad] Orbit innclination
+OM = deg2rad(80);                                % [rad] Orbit RAAN
+om = deg2rad(123);                               % [rad] Orbit pericenter anomaly
 th = deg2rad(0);                                 % [rad] Orbit true anomaly
 
 %%% INERTIAS
@@ -128,9 +128,9 @@ settings.Value.Tsim = Tperiod;
 simOut = sim('model.slx', 'SrcWorkspace', 'current');
 
 %%
-Retrieve output data
-T = simOut.tout;            % [s] Simulation time
-R = simOut.Y.Data;
+% Retrieve output data
+% T = simOut.tout;            % [s] Simulation time
+% R = simOut.Y.Data;
 DCM_I2L = simOut.DCM_I2L.Data;
 DCM_I2B = simOut.DCM_I2B.Data;
 DCM_L2B = simOut.DCM_L2B.Data;
@@ -143,7 +143,10 @@ estMD = simOut.estMD.Data;
 magnetoM = simOut.MagnetoM.Data;
 RWsM = simOut.RWsM.Data;
 Mtot = simOut.Mtot.Data;
-
+Gyro_end = simOut.gyro_end.Data;
+Mc_RW = simOut.Mc_RW.Data;
+Mc_magneto = simOut.Mc_magneto.Data;
+pointing_err = simOut.pointing_err.Data;
 %% detumbling only magnetotorquers
 index = find(T >= 0 & T < 1500);
 plot(index,quaternions);

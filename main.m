@@ -128,120 +128,320 @@ settings.Value.Tsim = Tperiod;
 simOut = sim('model.slx', 'SrcWorkspace', 'current');
 
 %%
+set(groot,'defaultAxesTickLabelInterpreter','latex');
+set(groot,'defaulttextinterpreter','latex');
+set(groot,'defaultLegendInterpreter','latex');
+
 % Retrieve output data
-% T = simOut.tout;            % [s] Simulation time
+T = simOut.tout;            % [s] Simulation time
 % R = simOut.Y.Data;
 DCM_I2L = simOut.DCM_I2L.Data;
 DCM_I2B = simOut.DCM_I2B.Data;
 DCM_L2B = simOut.DCM_L2B.Data;
 quaternions = simOut.quaternions.Data;
 omegaReal = simOut.omegaReal.Data;
+omegaEstim = simOut.omega_estim.Data;
 disturb = simOut.Disturbances.Data;
 eclipse = simOut.eclipse.Data;
 attErr = simOut.attitudeEstimate.Data;
 estMD = simOut.estMD.Data;
 magnetoM = simOut.MagnetoM.Data;
-RWsM = simOut.RWsM.Data;
-Mtot = simOut.Mtot.Data;
+Mreal = simOut.Mtot.Data;
 Gyro_end = simOut.gyro_end.Data;
 Mc_RW = simOut.Mc_RW.Data;
-Mc_magneto = simOut.Mc_magneto.Data;
+Mid = simOut.Mc_magneto.Data;
 pointing_err = simOut.pointing_err.Data;
+RWsM = simOut.RWsM.Data;
+Dmagn = simOut.Dmagn.Data;
+a = 6971;
 %% detumbling only magnetotorquers
-index = find(T >= 0 & T < 1500);
-plot(index,quaternions);
-plot(index,omegaReal);
-plot(index,disturb);
-plot(index,eclipse);
-plot(index,attErr);
-plot(index,estMD);
-plot(index,magnetoM);
-plot(index,RWsM);
-plot(index,Mtot);
+indexDet = find(T >= 0 & T < settings.Value.detumblingDetumblingMaxTime);
+indexOnlyMagn = find(T >= 0 & T < settings.Value.detumblingOnlyMagnMaxTime);
+indexDetRW = find(T >= settings.Value.detumblingOnlyMagnMaxTime & T < settings.Value.detumblingDetumblingMaxTime);
 
-%% second phase detumbling
-index = find(T >1500 & T < 2500);
-plot(index,quaternions);
-plot(index,omegaReal);
-plot(index,disturb);
-plot(index,eclipse);
-plot(index,attErr);
-plot(index,estMD);
-plot(index,magnetoM);
-plot(index,RWsM);
-plot(index,Mtot);
+%% DETUMBLING PLOTS
+%%% omega Real only magnetotoruqers
+figure
+plot(T(indexOnlyMagn), omegaReal(indexOnlyMagn, 1), 'LineWidth', 1); grid on; hold on;
+plot(T(indexOnlyMagn), omegaReal(indexOnlyMagn, 2), 'LineWidth', 1);
+plot(T(indexOnlyMagn), omegaReal(indexOnlyMagn, 3), 'LineWidth', 1);
+legend('$\omega_x$', '$\omega_y$', '$\omega_z$')
+xlabel('t [s]'); ylabel('$\omega$ [$\frac{rad}{s}$]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)
 
-%% slew maneuver
-index = find(T > 2500 & T < 3500);
-plot(index,quaternions);
-plot(index,omegaReal);
-plot(index,disturb);
-plot(index,eclipse);
-plot(index,attErr);
-plot(index,estMD);
-plot(index,magnetoM);
-plot(index,RWsM);
-plot(index,Mtot);
+%%% omega Real with RWs also
+figure
+plot(T(indexDetRW), omegaReal(indexDetRW, 1), 'LineWidth', 1); grid on; hold on;
+plot(T(indexDetRW), omegaReal(indexDetRW, 2), 'LineWidth', 1);
+plot(T(indexDetRW), omegaReal(indexDetRW, 3), 'LineWidth', 1);
+legend('$\omega_x$', '$\omega_y$', '$\omega_z$')
+xlabel('t [s]'); ylabel('$\omega$ [$\frac{rad}{s}$]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)
 
-%% earth poiting maneuver
-index = find(T >3500 & T < Tperiod);
-plot(index,quaternions);
-plot(index,omegaReal);
-plot(index,disturb);
-plot(index,eclipse);
-plot(index,attErr);
-plot(index,estMD);
-plot(index,magnetoM);
-plot(index,RWsM);
-plot(index,Mtot);
+%%% quaternions
+figure
+plot(T(indexDet), quaternions(indexDet, 1), 'LineWidth', 1); grid on; hold on;
+plot(T(indexDet), quaternions(indexDet, 2), 'LineWidth', 1);
+plot(T(indexDet), quaternions(indexDet, 3), 'LineWidth', 1);
+plot(T(indexDet), quaternions(indexDet, 4), 'LineWidth', 1);
+legend('$q_0$', '$q_1$', '$q_2$', '$q_3$')
+xlabel('t [s]'); ylabel('q [-]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)
 
-%% PLOT
-% figure;
-% quiver3(0,0,0,10000,0,0); grid on; hold on
-% axis equal
-% quiver3(0,0,0,0,10000,0);
-% quiver3(0,0,0,0,0,10000);
-% 
-% % Local
-% xl_vec = 5000 .* DCM_I2L(:,:,1)'*[1 0 0]';
-% xl = quiver3(R(1,1),R(1,2),R(1,3),xl_vec(1),xl_vec(2),xl_vec(3), 'k');
-% yl_vec = 5000 .* DCM_I2L(:,:,1)'*[0 1 0]';
-% yl = quiver3(R(1,1),R(1,2),R(1,3),yl_vec(1),yl_vec(2),yl_vec(3), 'k');
-% zl_vec = 5000 .* DCM_I2L(:,:,1)'*[0 0 1]';
-% zl = quiver3(R(1,1),R(1,2),R(1,3),zl_vec(1),zl_vec(2),zl_vec(3), 'k');
-% 
-% % Body
-% xb_vec = 5000 .* DCM_I2B(:,:,1)'*[1 0 0]';
-% xb = quiver3(R(1,1),R(1,2),R(1,3),xb_vec(1),xb_vec(2),xb_vec(3), 'b');
-% yb_vec = 5000 .* DCM_I2B(:,:,1)'*[0 1 0]';
-% yb = quiver3(R(1,1),R(1,2),R(1,3),yb_vec(1),yb_vec(2),yb_vec(3), 'r');
-% zb_vec = 5000 .* DCM_I2B(:,:,1)'*[0 0 1]';
-% zb = quiver3(R(1,1),R(1,2),R(1,3),zb_vec(1),zb_vec(2),zb_vec(3), 'y');
-% 
-% plot3(R(:,1), R(:,2), R(:,3), '--r', 'LineWidth', 1)
-% 
-% for i = 2:300:length(T)
-%     % Local
-%     delete(xl)
-%     delete(yl)
-%     delete(zl)
-%     xl_vec = 5000 .* DCM_I2L(:,:,i)'*[1 0 0]';
-%     xl = quiver3(R(i,1),R(i,2),R(i,3),xl_vec(1),xl_vec(2),xl_vec(3),'k');
-%     yl_vec = 5000 .* DCM_I2L(:,:,i)'*[0 1 0]';
-%     yl = quiver3(R(i,1),R(i,2),R(i,3),yl_vec(1),yl_vec(2),yl_vec(3),'k');
-%     zl_vec = 5000 .* DCM_I2L(:,:,i)'*[0 0 1]';
-%     zl = quiver3(R(i,1),R(i,2),R(i,3),zl_vec(1),zl_vec(2),zl_vec(3),'k');
-% 
-%     % Body
-%     delete(xb)
-%     delete(yb)
-%     delete(zb)
-%     xb_vec = 5000 .* DCM_I2B(:,:,i)'*[1 0 0]';
-%     xb = quiver3(R(i,1),R(i,2),R(i,3),xb_vec(1),xb_vec(2),xb_vec(3),'b');
-%     yb_vec = 5000 .* DCM_I2B(:,:,i)'*[0 1 0]';
-%     yb = quiver3(R(i,1),R(i,2),R(i,3),yb_vec(1),yb_vec(2),yb_vec(3),'r');
-%     zb_vec = 5000 .* DCM_I2B(:,:,i)'*[0 0 1]';
-%     zb = quiver3(R(i,1),R(i,2),R(i,3),zb_vec(1),zb_vec(2),zb_vec(3),'y');
-%     drawnow limitrate
-% end
+%%% pointing error
+figure
+plot(T(indexDet), pointing_err(indexDet), 'LineWidth', 1); grid on; hold on;
+xlabel('t [s]'); ylabel('Error [deg]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)
 
+%%% Real control momentum
+figure
+plot(T(indexDet), Mreal(indexDet, 1), 'LineWidth', 1); grid on; hold on;
+plot(T(indexDet), Mreal(indexDet, 2), 'LineWidth', 1);
+plot(T(indexDet), Mreal(indexDet, 3), 'LineWidth', 1);
+legend('$M_{c, x}$', '$M_{c, y}$', '$M_{c, z}$')
+xlabel('t [s]'); ylabel('$M_c$ [Nm]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)
+
+%%% Ideal - real control moment
+figure
+T1 = T(indexDetRW);
+Mreal1 = Mreal(indexDetRW, :);
+Mid1 = Mid(indexDetRW, :);
+plot(T1(2:end), -Mreal1(2:end, 1)+Mid1(2:end, 1), 'LineWidth', 1); grid on; hold on;
+plot(T1(2:end), -Mreal1(2:end, 2)+Mid1(2:end, 2), 'LineWidth', 1);
+plot(T1(2:end), -Mreal1(2:end, 3)+Mid1(2:end, 3), 'LineWidth', 1);
+legend('$\delta M_{c, x}$', '$\delta M_{c, y}$', '$\delta M_{c, z}$')
+xlabel('t [s]'); ylabel('${M_{c}}^{id}$ - $M_c$ [Nm]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)
+
+%%% RW torque
+figure
+plot(T(indexDet), RWsM(indexDet, 1), 'LineWidth', 1); grid on; hold on;
+plot(T(indexDet), RWsM(indexDet, 2), 'LineWidth', 1);
+plot(T(indexDet), RWsM(indexDet, 3), 'LineWidth', 1);
+xlabel('t [s]'); ylabel('$M_r$ [Nm]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)
+
+%%% magnetotorquer Dipole
+figure
+plot(T(indexDet), Dmagn(indexDet, 1), 'LineWidth', 1); grid on; hold on;
+plot(T(indexDet), Dmagn(indexDet, 2), 'LineWidth', 1);
+plot(T(indexDet), Dmagn(indexDet, 3), 'LineWidth', 1);
+legend('$D_{x}$', '$D_{y}$', '$D_{z}$')
+xlabel('t [s]'); ylabel('D [A$m^2$]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)
+
+
+%% SLEW MANEUVER PLOTS
+indexSlew = find(T >= settings.Value.detumblingDetumblingMaxTime & T < settings.Value.slewManeuverMaxTime);
+
+%%% omega
+figure
+plot(T(indexSlew), omegaReal(indexSlew, 1), 'LineWidth', 1); grid on; hold on;
+plot(T(indexSlew), omegaReal(indexSlew, 2), 'LineWidth', 1);
+plot(T(indexSlew), omegaReal(indexSlew, 3), 'LineWidth', 1);
+n = sqrt(398600/a^3);
+plot(T(indexSlew), n*ones(length(T(indexSlew)), 1), '--k', 'LineWidth', 1)
+legend('$\omega_x$', '$\omega_y$', '$\omega_z$')
+xlabel('t [s]'); ylabel('$\omega$ [$\frac{rad}{s}$]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)
+
+%%% quaternions
+figure
+plot(T(indexSlew), quaternions(indexSlew, 1), 'LineWidth', 1); grid on; hold on;
+plot(T(indexSlew), quaternions(indexSlew, 2), 'LineWidth', 1);
+plot(T(indexSlew), quaternions(indexSlew, 3), 'LineWidth', 1);
+plot(T(indexSlew), quaternions(indexSlew, 4), 'LineWidth', 1);
+legend('$q_0$', '$q_1$', '$q_2$', '$q_3$')
+xlabel('t [s]'); ylabel('q [-]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)
+
+%%% pointing error
+figure
+plot(T(indexSlew), pointing_err(indexSlew), 'LineWidth', 1); grid on; hold on;
+xlabel('t [s]'); ylabel('Error [deg]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)
+
+%%% Real control momentum
+figure
+plot(T(indexSlew), Mreal(indexSlew, 1), 'LineWidth', 1); grid on; hold on;
+plot(T(indexSlew), Mreal(indexSlew, 2), 'LineWidth', 1);
+plot(T(indexSlew), Mreal(indexSlew, 3), 'LineWidth', 1);
+legend('$M_{c, x}$', '$M_{c, y}$', '$M_{c, z}$')
+xlabel('t [s]'); ylabel('$M_c$ [Nm]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)
+
+%%% Ideal - real control moment
+figure
+T1 = T(indexSlew);
+Mreal1 = Mreal(indexSlew, :);
+Mid1 = Mid(indexSlew, :);
+plot(T1(2:end), -Mreal1(2:end, 1)+Mid1(2:end, 1), 'LineWidth', 1); grid on; hold on;
+plot(T1(2:end), -Mreal1(2:end, 2)+Mid1(2:end, 2), 'LineWidth', 1);
+plot(T1(2:end), -Mreal1(2:end, 3)+Mid1(2:end, 3), 'LineWidth', 1);
+legend('$\delta M_{c, x}$', '$\delta M_{c, y}$', '$\delta M_{c, z}$')
+xlabel('t [s]'); ylabel('${M_{c}}^{id}$ - $M_c$ [Nm]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)
+
+%%% RW torque
+figure
+plot(T(indexSlew), RWsM(indexSlew, 1), 'LineWidth', 1); grid on; hold on;
+plot(T(indexSlew), RWsM(indexSlew, 2), 'LineWidth', 1);
+plot(T(indexSlew), RWsM(indexSlew, 3), 'LineWidth', 1);
+xlabel('t [s]'); ylabel('$M_r$ [Nm]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)
+
+%%% magnetotorquer Dipole
+figure
+plot(T(indexSlew), Dmagn(indexSlew, 1), 'LineWidth', 1); grid on; hold on;
+plot(T(indexSlew), Dmagn(indexSlew, 2), 'LineWidth', 1);
+plot(T(indexSlew), Dmagn(indexSlew, 3), 'LineWidth', 1);
+legend('$D_{x}$', '$D_{y}$', '$D_{z}$')
+xlabel('t [s]'); ylabel('D [A$m^2$]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)
+
+
+
+%% EARTH POINT PLOTS
+indexPoint = find(T >= settings.Value.slewManeuverMaxTime);
+
+%%% omega
+figure
+plot(T(indexPoint), omegaReal(indexPoint, 1), 'LineWidth', 1); grid on; hold on;
+plot(T(indexPoint), omegaReal(indexPoint, 2), 'LineWidth', 1);
+plot(T(indexPoint), omegaReal(indexPoint, 3), 'LineWidth', 1);
+n = sqrt(398600/a^3);
+plot(T(indexPoint), n*ones(length(T(indexPoint)), 1), '--k', 'LineWidth', 1)
+legend('$\omega_x$', '$\omega_y$', '$\omega_z$')
+xlabel('t [s]'); ylabel('$\omega$ [$\frac{rad}{s}$]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)
+
+%%% quaternions
+figure
+plot(T(indexPoint), quaternions(indexPoint, 1), 'LineWidth', 1); grid on; hold on;
+plot(T(indexPoint), quaternions(indexPoint, 2), 'LineWidth', 1);
+plot(T(indexPoint), quaternions(indexPoint, 3), 'LineWidth', 1);
+plot(T(indexPoint), quaternions(indexPoint, 4), 'LineWidth', 1);
+legend('$q_0$', '$q_1$', '$q_2$', '$q_3$')
+xlabel('t [s]'); ylabel('q [-]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)
+
+%%% pointing error
+figure
+plot(T(indexPoint), pointing_err(indexPoint), 'LineWidth', 1); grid on; hold on;
+xlabel('t [s]'); ylabel('Error [deg]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)
+
+%%% Real control momentum
+figure
+plot(T(indexPoint), Mreal(indexPoint, 1), 'LineWidth', 1); grid on; hold on;
+plot(T(indexPoint), Mreal(indexPoint, 2), 'LineWidth', 1);
+plot(T(indexPoint), Mreal(indexPoint, 3), 'LineWidth', 1);
+legend('$M_{c, x}$', '$M_{c, y}$', '$M_{c, z}$')
+xlabel('t [s]'); ylabel('$M_c$ [Nm]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)
+
+%%% Ideal - real control moment
+figure
+T1 = T(indexPoint);
+Mreal1 = Mreal(indexPoint, :);
+Mid1 = Mid(indexPoint, :);
+plot(T1(2:end), -Mreal1(2:end, 1)+Mid1(2:end, 1), 'LineWidth', 1); grid on; hold on;
+plot(T1(2:end), -Mreal1(2:end, 2)+Mid1(2:end, 2), 'LineWidth', 1);
+plot(T1(2:end), -Mreal1(2:end, 3)+Mid1(2:end, 3), 'LineWidth', 1);
+legend('$\delta M_{c, x}$', '$\delta M_{c, y}$', '$\delta M_{c, z}$')
+xlabel('t [s]'); ylabel('${M_{c}}^{id}$ - $M_c$ [Nm]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)
+
+%%% RW torque
+figure
+plot(T(indexPoint), RWsM(indexPoint, 1), 'LineWidth', 1); grid on; hold on;
+plot(T(indexPoint), RWsM(indexPoint, 2), 'LineWidth', 1);
+plot(T(indexPoint), RWsM(indexPoint, 3), 'LineWidth', 1);
+xlabel('t [s]'); ylabel('$M_r$ [Nm]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)
+
+%%% magnetotorquer Dipole
+figure
+plot(T(indexPoint), Dmagn(indexPoint, 1), 'LineWidth', 1); grid on; hold on;
+plot(T(indexPoint), Dmagn(indexPoint, 2), 'LineWidth', 1);
+plot(T(indexPoint), Dmagn(indexPoint, 3), 'LineWidth', 1);
+legend('$D_{x}$', '$D_{y}$', '$D_{z}$')
+xlabel('t [s]'); ylabel('D [A$m^2$]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)
+
+%% ECLIPSE
+indexEcl = find(T >= 2500);
+index1 = find(eclipse >=1, 1, 'first');
+index2 = find(eclipse >=1, 1, 'last');
+%%% is eclipse
+figure
+plot(T, eclipse, 'LineWidth', 1); grid on; hold on;
+xlabel('t [s]'); ylabel('Eclipse [-]')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+ylim([-0.1, 1.1])
+set(gca, 'FontSize', 13)
+
+%%% Attitude matrix error
+figure
+plot(T(indexEcl), squeeze(attErr(1, 1, (indexEcl))), 'LineWidth', 1); grid on; hold on;
+plot(T(indexEcl), squeeze(attErr(1, 1, (indexEcl))), 'LineWidth', 1);
+plot(T(indexEcl), squeeze(attErr(1, 1, (indexEcl))), 'LineWidth', 1);
+plot(T(indexEcl), squeeze(attErr(2, 1, (indexEcl))), 'LineWidth', 1);
+plot(T(indexEcl), squeeze(attErr(2, 2, (indexEcl))), 'LineWidth', 1);
+plot(T(indexEcl), squeeze(attErr(2, 3, (indexEcl))), 'LineWidth', 1);
+plot(T(indexEcl), squeeze(attErr(3, 1, (indexEcl))), 'LineWidth', 1);
+plot(T(indexEcl), squeeze(attErr(3, 2, (indexEcl))), 'LineWidth', 1);
+plot(T(indexEcl), squeeze(attErr(3, 3, (indexEcl))), 'LineWidth', 1);
+xlabel('t [s]'); ylabel('$A_{B/N}$ - $\bar{A}_{B/N}$')
+xline(T(index1), '--k', 'start eclipse')
+xline(T(index2), '--k', 'end eclipse')
+xlow = xlim; xlow = xlow(1); xup = xlim; xup = xup(2);
+xticks(floor(linspace(xlow, xup, 6)))
+set(gca, 'FontSize', 13)

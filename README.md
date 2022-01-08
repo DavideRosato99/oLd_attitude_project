@@ -1,4 +1,4 @@
-# Attitude project
+# Spacecraft Attitude Final Project
 TEAM MEMBERS:
 
   Rosato Davide, davide.rosato@mail.polimi.it
